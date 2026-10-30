@@ -1,0 +1,5 @@
+build/
+.geode/
+*.geode
+spam-tests
+__pycache__/

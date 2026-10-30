@@ -1,0 +1,30 @@
+name: Windows alpha
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  engine:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/check-comments.py
+      - run: g++ -std=c++23 -Wall -Wextra -Werror -fsanitize=address,undefined -Isrc tests/SpamSmootherTest.cpp src/engine/SpamSmoother.cpp -o spam-tests
+      - run: ./spam-tests
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build mod
+        id: geode-build
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          target: Win64
+          sdk: v5.8.2
+          build-config: Release
+      - name: Upload windows mod
+        uses: actions/upload-artifact@v4
+        with:
+          name: alt-spam-helper-windows
+          path: ${{ steps.geode-build.outputs.build-output }}/*.geode
+          if-no-files-found: error
